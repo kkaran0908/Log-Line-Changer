@@ -267,7 +267,7 @@ void adl_algo_bin::process_external_request (const std::shared_ptr<AlgoJobReques
             }
             else
             {
-                ALGO_WLOG("[algo:%s] Algo has no Export Value. Ignore reuqest=%s", inst_id().to_string(),ALGOJOB_REQUEST_ID_STR[request->id]);
+                TTLOG<<"[algo:"<< inst_id().to_string() <<"] Algo has no Export Value. Ignore reuqest="<< ALGOJOB_REQUEST_ID_STR[request->id] <<;
             }
             return;
 
@@ -473,10 +473,7 @@ void adl_algo_bin::init_action (algoif::AlgoAction action)
 {
     if (m_host_if->IsActionValid(action) == false)
     {
-        ALGO_WLOG("[algo:%s] action=%s invalid: state=%s",
-                  inst_id().to_string(),
-                  ALGO_ACTION_STR[ action],
-                  ALGO_STATE_STR[m_host_if->get_state()]);
+        TTLOG<<"[algo:"<< inst_id().to_string() <<"] action="<< ALGO_ACTION_STR[action] <<" invalid: state="<< ALGO_STATE_STR[m_host_if->get_state()] <<;
         return;
     }
 
@@ -643,18 +640,14 @@ void adl_algo_bin::process_compilation_completed_event (enum instr_compile_reaso
         // Check if the analytics block is enabled on this server.
         if (!env::instance().is_analytics_enabled() && dl()->algo_graph.analyticsBlockCount > 0)
         {
-            ALGO_WLOG("[algo:%s]: Analytics Block usage is disabled on the server",
-                      inst_id().to_string());
+            TTLOG<<"[algo:"<< inst_id().to_string() <<"]: Analytics Block usage is disabled on the server";
             throw algojob__request_failure_analytics_disabled;
         }
 
         // Check that the number of analytics blocks per algo does not exceed the limit.
         if (dl()->algo_graph.analyticsBlockCount > env::instance().max_analytics_blocks())
         {
-            ALGO_WLOG("[algo:%s]: The number of Analytics Blocks in the algo (%d) exceeds the max allowed on the server (%d)",
-                      inst_id().to_string(),
-                      dl()->algo_graph.analyticsBlockCount,
-                      env::instance().max_analytics_blocks());
+            TTLOG<<"[algo:"<< inst_id().to_string() <<"]: The number of Analytics Blocks in the algo ("<< dl()->algo_graph.analyticsBlockCount <<") exceeds the max allowed on the server ("<< env::instance().max_analytics_blocks() <<")";
             throw algojob__request_failure_too_many_analytics_blocks;
         }
 
@@ -1101,11 +1094,7 @@ void adl_algo_bin::run_periodic_host_task ()
 void adl_algo_bin::reject_request (const std::shared_ptr<algojob__request>& request)
 {
     auto state = m_state.load(std::memory_order_relaxed);
-    ALGO_WLOG("[algo:%s] request[%s][id:%llu] rejected. state=%s",
-              inst_id().to_string(),
-              ALGOJOB_REQUEST_ID_STR[request->id],
-              request->user_request_id,
-              ALGO_STATE_STR[state]);
+    TTLOG<<"[algo:"<< inst_id().to_string() <<"] request["<< ALGOJOB_REQUEST_ID_STR[request->id] <<"][id:"<< request->user_request_id <<"lu] rejected. state="<< ALGO_STATE_STR[state] <<;
 
     server_connection::instance().send_request_failure(
         request->id,
@@ -1131,7 +1120,7 @@ void adl_algo_bin::suppress_action ()
     }
     else
     {
-        ALGO_WLOG("[algo:%s] skip SetSuppressActionFlag. state=%s", inst_id().to_string(), ALGO_STATE_STR[state]);
+        TTLOG<<"[algo:"<< inst_id().to_string() <<"] skip SetSuppressActionFlag. state="<< ALGO_STATE_STR[state] <<;
     }
 }
 
